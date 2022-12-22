@@ -5,7 +5,7 @@ This script aims to automate repetitive buying of csgo sticker capsules from cur
 
 
 
-***BEWARE of the number of items you input (sum of capsules you want to buy) because your inventory may overflow and this app will stop. Also if you have no sufficent balance/funds in your steam wallet this app will stop. Don't move your mouse while the app is running***
+***BEWARE of the number of items you input (sum of capsules you want to buy) because your inventory may overflow and this app will stop. Also if you have no sufficent balance/funds in your steam wallet this app will stop. Don't move your mouse while the app is running.***
 
 Prerequisites:
 - python 3.11.1 
