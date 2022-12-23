@@ -24,14 +24,11 @@ GUI error examples:
 ![image](https://user-images.githubusercontent.com/73882365/209372493-cbf8d4ec-39c3-490e-8886-2813ed0c600e.png)
 ![Screenshot_20221223_173422](https://user-images.githubusercontent.com/73882365/209372334-fe61a28e-a74d-41d8-a05b-4036e57f148d.png)
 
-*csgo-sticker-buyer.py* is a version with console
-
-*csgo-sticker-buyer.pyw* is a version without console
+- *csgo-sticker-buyer.py* is a version with console    
+- *csgo-sticker-buyer.pyw* is a version without console
 
 Link to YouTube video of the app running:
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/w9QcKshCkaQ/0.jpg)](https://youtu.be/w9QcKshCkaQ)
 
-
-***IF YOU DON'T KNOW WHAT YOU ARE DOING HERE, DON'T RUN THIS CODE***
 
