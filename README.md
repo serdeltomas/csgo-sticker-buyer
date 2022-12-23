@@ -3,6 +3,9 @@ csgo-sticker-buyer
 
 This script aims to automate repetitive buying of csgo sticker capsules from current major (RIO 2022). For now it is dumb script clicking on a hard coded sets of coordinates in order to speed up the process, as the used library is slow at finding exact images on the screen, it is only used for the authorize button in overlay, because that item's position may vary.
 
+GUI example:
+
+![image](https://user-images.githubusercontent.com/73882365/209368198-6c7766aa-3d01-4e84-8710-a2f0618c8e78.png)
 
 
 ***BEWARE of the number of items you input (sum of capsules you want to buy) because your inventory may overflow and this app will stop. Also if you have no sufficent balance/funds in your steam wallet this app will stop. Don't move your mouse while the app is running.***
