@@ -4,6 +4,41 @@ import pyautogui
 import time
 import threading
 
+DELAY_WHEN_BUYING = 0.1
+
+def loading(full,now):
+    now_perc = 100.0*(1.0*now/full)
+    now_perc = '{:05.2f}'.format(float(now_perc))
+    print(now_perc + "%")
+    result = " " + now_perc + "% ▕"
+    now_perc_quart = float(now_perc)/5
+    full_blocks = int(now_perc_quart // 1)
+    now_perc_quart = now_perc_quart-full_blocks
+    for x in range(0,full_blocks):
+        result = result + "█"
+    if now_perc_quart>=0.125:
+        halfblock = 1
+    else:
+        halfblock = 0
+    if now_perc_quart>=0.875:
+        result = result + "▉"
+    elif now_perc_quart>=0.75:
+        result = result + "▊"
+    elif now_perc_quart>=0.625:
+        result = result + "▋"
+    elif now_perc_quart>=0.5:
+        result = result + "▌"
+    elif now_perc_quart>=0.375:
+        result = result + "▍"
+    elif now_perc_quart>=0.25:
+        result = result + "▎"
+    elif now_perc_quart>=0.125:
+        result = result + "▏"
+    for x in range(0,20-full_blocks-halfblock):
+        result = result + "▔"
+    result = result + "▏ "
+    return result
+
 def recalculate_on_edit(*args):
     try:
         sumofall.set(int(spin11.get()) + int(spin12.get()) + int(spin13.get()) + int(spin14.get()) + int(spin15.get()) + int(spin16.get()) + int(spin17.get()))
@@ -54,7 +89,7 @@ def clickCount(sticker_count):
     elif sticker_count > 10:
         sticker_count = sticker_count - 10
         click(scroll_down_pos)
-        time.sleep(0.1)
+        time.sleep(DELAY_WHEN_BUYING)
         click(list(num_pos_dict.values())[sticker_count - 1])
 
 def waitFor(image):
@@ -64,34 +99,51 @@ def waitFor(image):
         found_img = pyautogui.locateOnScreen(image)
         if pyautogui.locateOnScreen("img/add_funds.png") != None:
             tip.configure(bg="orange", fg="#2d2d30", text=" ! run stopped, add more funds to your steam wallet ! ")
-            btn.configure(state='normal', bg="#007ACC")
             return False
         time_now = time.perf_counter()
-        print(time_now - time_start)
         if (time_now - time_start) > 10:
             tip.configure(bg="orange", fg="#2d2d30", text=(" ! run stopped, no image found - " + image + " ! "))
-            btn.configure(state='normal', bg="#007ACC")
             return False
     return True
     
+def show_spins(is_show):
+    if is_show == True:
+        spin11.configure(state='normal')
+        spin12.configure(state='normal')
+        spin13.configure(state='normal')
+        spin14.configure(state='normal')
+        spin15.configure(state='normal')
+        spin16.configure(state='normal')
+        spin17.configure(state='normal')
+    elif is_show == False:
+        spin11.configure(state='disabled')
+        spin12.configure(state='disabled')
+        spin13.configure(state='disabled')
+        spin14.configure(state='disabled')
+        spin15.configure(state='disabled')
+        spin16.configure(state='disabled')
+        spin17.configure(state='disabled')
+    
 def buy(sticker_name,num_stickers):
-    time.sleep(0.1)
+    time.sleep(DELAY_WHEN_BUYING)
     click(getParent(sticker_name))
-    time.sleep(0.1)
+    time.sleep(DELAY_WHEN_BUYING)
     click(getPos(sticker_name))
-    time.sleep(0.1)
+    time.sleep(DELAY_WHEN_BUYING)
     click(dropdown_menu_pos)
-    time.sleep(0.1)
+    time.sleep(DELAY_WHEN_BUYING)
     clickCount(num_stickers)
-    time.sleep(0.1)
+    time.sleep(DELAY_WHEN_BUYING)
     click(price_btn_pos)
-    waitFor("img/authorize.png")
+    if waitFor("img/authorize.png")==False:
+        return False
     pyautogui.move(-23,-55)
     pyautogui.click('img/authorize.png')
-    waitFor("img/continue.png")
+    if waitFor("img/continue.png")==False:
+        return False
     pyautogui.press('esc')
     print("bought:\t",num_stickers)
-    return
+    return True
 
 #do for every type of sticker
 #repeat while x!=0 do x>20? do 20 buy else do x buy
@@ -106,7 +158,10 @@ def main_prog():
     'cont_aut' : int(spin16.get()),
     'champ_aut' : int(spin17.get())}
     
-    if waitFor("img/rio_2022.png")!=True:
+    all_count = int(sumofalltxt.cget("text"))
+    now_count = 0
+    
+    if waitFor("img/rio_2022.png")==False:
         return False
     
     for sticker_name in sticker_count_dict:
@@ -115,21 +170,26 @@ def main_prog():
         while sticker_count != 0:
             if sticker_count >= 20:
                 sticker_count = sticker_count - 20 
-                buy(sticker_name,20)
+                if buy(sticker_name,20) == False:
+                    return False
+                now_count = now_count + 20
             else:
-                buy(sticker_name,sticker_count)
+                if buy(sticker_name,sticker_count) == False:
+                    return False
+                now_count = now_count + sticker_count
                 sticker_count = 0
-    print("STICKERS BOUGHT")
+            tip.configure(text=loading(all_count,now_count))
+    print("CAPSULES BOUGHT: ",all_count)
     return True
-   
+    
 def click_start_btn():
+    show_spins(False)
     btn.configure(state='disabled', bg='#252526')
-    tip.configure(bg="green", fg="#8A8A8A", text="  Programm is Running  ")
-    if main_prog()!=True:
-        btn.configure(state='normal', bg="#007ACC")
-        return False
-    tip.configure(bg="green",fg ="#2d2d30", text="  Done, ready for next run  ")
-    btn.configure(state='normal', bg="#007ACC")
+    tip.configure(bg="black",fg ="#8A8A8A", text=loading(100,0))
+    if main_prog()==True:
+        time.sleep(1)
+        tip.configure(bg="green",fg ="#2d2d30", text="  Done, Restart app if you want to buy more  ")    
+    btn.configure(text='Restart app')
     
 
 # positions of all elements
@@ -190,25 +250,25 @@ lbl07 = Label(window, text="Champions Autograph Capsule", bg="#2d2d30", fg="#8A8
 lbl07.grid(column=0, row=7)
 
 spin11txt = IntVar(window,"0")
-spin11 = Spinbox(window, from_=0, to=1000, textvariable=spin11txt, width=10,fg="white",bg="#454545", buttonbackground="#000000")
+spin11 = Spinbox(window, from_=0, to=1000, textvariable=spin11txt, width=10,fg="white",bg="#454545", buttonbackground="#000000",disabledbackground="#252526")
 spin11.grid(column=1, row=1, pady=2)
 spin12txt = IntVar(window,"0")
-spin12 = Spinbox(window, from_=0, to=1000, textvariable=spin12txt, width=10,fg="white",bg="#454545", buttonbackground="#000000")
+spin12 = Spinbox(window, from_=0, to=1000, textvariable=spin12txt, width=10,fg="white",bg="#454545", buttonbackground="#000000",disabledbackground="#252526")
 spin12.grid(column=1, row=2)
 spin13txt = IntVar(window,"0")
-spin13 = Spinbox(window, from_=0, to=1000, textvariable=spin13txt, width=10,fg="white",bg="#454545", buttonbackground="#000000")
+spin13 = Spinbox(window, from_=0, to=1000, textvariable=spin13txt, width=10,fg="white",bg="#454545", buttonbackground="#000000",disabledbackground="#252526")
 spin13.grid(column=1, row=3, pady=2)
 spin14txt = IntVar(window,"0")
-spin14 = Spinbox(window, from_=0, to=1000, textvariable=spin14txt, width=10,fg="white",bg="#454545", buttonbackground="#000000")
+spin14 = Spinbox(window, from_=0, to=1000, textvariable=spin14txt, width=10,fg="white",bg="#454545", buttonbackground="#000000",disabledbackground="#252526")
 spin14.grid(column=1, row=4)
 spin15txt = IntVar(window,"0")
-spin15 = Spinbox(window, from_=0, to=1000, textvariable=spin15txt, width=10,fg="white",bg="#454545", buttonbackground="#000000")
+spin15 = Spinbox(window, from_=0, to=1000, textvariable=spin15txt, width=10,fg="white",bg="#454545", buttonbackground="#000000",disabledbackground="#252526")
 spin15.grid(column=1, row=5, pady=2)
 spin16txt = IntVar(window,"0")
-spin16 = Spinbox(window, from_=0, to=1000, textvariable=spin16txt, width=10,fg="white",bg="#454545", buttonbackground="#000000")
+spin16 = Spinbox(window, from_=0, to=1000, textvariable=spin16txt, width=10,fg="white",bg="#454545", buttonbackground="#000000",disabledbackground="#252526")
 spin16.grid(column=1, row=6)
 spin17txt = IntVar(window,"0")
-spin17 = Spinbox(window, from_=0, to=1000, textvariable=spin17txt, width=10,fg="white",bg="#454545", buttonbackground="#000000")
+spin17 = Spinbox(window, from_=0, to=1000, textvariable=spin17txt, width=10,fg="white",bg="#454545", buttonbackground="#000000",disabledbackground="#252526")
 spin17.grid(column=1, row=7, pady=2)
 
 spin11txt.trace('w', recalculate_on_edit)
@@ -225,7 +285,7 @@ sumofall = IntVar(window,"0")
 sumofalltxt = Label(window, width=10,textvariable=sumofall, bg="#454545", fg="#8A8A8A")
 sumofalltxt.grid(column=1, row=8)
 
-tip = Label(window, bg="#2d2d30", fg="#2d2d30")
+tip = Label(window, bg="#2d2d30", fg="#2d2d30", font=("Lucida Sans Unicode",8))
 tip.grid(row=9, columnspan = 2, pady=5)
 
 #click start button
