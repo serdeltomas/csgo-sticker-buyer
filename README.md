@@ -1,6 +1,7 @@
 csgo-sticker-buyer
 ## Automation for buying CS:GO Major sticker capsules
 
+With this tool you can buy ~150 capsules/minute
 This script aims to automate repetitive buying of csgo sticker capsules from current major (RIO 2022). For now it is dumb script clicking on a hard coded sets of coordinates in order to speed up the process, as the used library is slow at finding exact images on the screen, it is only used for the authorize button in overlay, because that item's position may vary.
 
 GUI examples:
